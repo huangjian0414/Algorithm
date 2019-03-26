@@ -23,8 +23,65 @@
 //    [self quickSort:array.mutableCopy];
 //    [self insertSort:array.mutableCopy];
 //    [self mergeSort:array];
-    [self shellSort:array];
+//    [self shellSort:array.mutableCopy];
+    [self radixSort:array.mutableCopy];
 }
+//MARK: - 基数排序
+-(void)radixSort:(NSMutableArray *)array
+{
+    NSMutableArray *buckets=[self createBucket];
+    NSInteger maxDigit=[self getMaxDigit:array];
+    for (int i=1; i<=maxDigit; i++) {
+        for (int j=0; j<array.count; j++) {
+            NSInteger baseNum=[self fetchBaseNumber:array[j] digit:i];
+            [buckets[baseNum] addObject:array[j]];//位上的数相同的放一起
+        }
+        NSInteger k=0;
+        for (int i=0; i<buckets.count; i++) {
+            NSMutableArray *bucket=buckets[i];
+            while (bucket.count != 0) {
+                NSNumber *number = [bucket objectAtIndex:0];
+                array[k] = number;
+                [bucket removeObjectAtIndex:0];
+                k++;
+            }
+        }
+    }
+    NSLog(@"77-- %@",array);
+}
+//提取每个原素的基数   digit 比如个位1 十位2
+-(NSInteger)fetchBaseNumber:(NSNumber *)number digit:(NSInteger)digit
+{
+    NSString *numString=[NSString stringWithFormat:@"%@",number];
+    if (digit>0&&digit<=numString.length) {
+        NSString *str=[numString substringWithRange:NSMakeRange(numString.length-digit, 1)];
+        return [str integerValue];
+    }
+    return 0;
+}
+//获取最大数的位数
+-(NSInteger)getMaxDigit:(NSMutableArray *)array
+{
+    NSInteger maxNum=[array.firstObject integerValue];
+    for (int i=0; i<array.count; i++) {
+        if (maxNum<[array[i]integerValue]) {
+            maxNum=[array[i]integerValue];
+        }
+    }
+    NSString *numString=[NSString stringWithFormat:@"%ld",maxNum];
+    return numString.length;
+}
+//创10个桶桶 存放位上的数是0-9
+-(NSMutableArray *)createBucket
+{
+    NSMutableArray *buckets=[NSMutableArray array];
+    for (int i=0; i<10; i++) {
+        NSMutableArray *array=[NSMutableArray array];
+        [buckets addObject:array];
+    }
+    return buckets;
+}
+//MARK: - 希尔排序
 -(void)shellSort:(NSMutableArray *)array
 {
     //5,8,3,7,22,4,10
