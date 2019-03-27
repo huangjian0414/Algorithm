@@ -17,15 +17,63 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     //假装都是整型
-    NSMutableArray *array=[NSMutableArray arrayWithArray:@[@(5),@(8),@(3),@(10),@(22),@(4),@(7),@(9)]];
+    NSMutableArray *array=[NSMutableArray array];
+    for (int i=0; i<100; i++) {
+        [array addObject:@(arc4random()%100)];
+    }
 //    [self bubbleSort:array.mutableCopy];
 //    [self selectSort:array.mutableCopy];
 //    [self quickSort:array.mutableCopy];
 //    [self insertSort:array.mutableCopy];
 //    [self mergeSort:array];
 //    [self shellSort:array.mutableCopy];
-    [self radixSort:array.mutableCopy];
+//    [self radixSort:array.mutableCopy];
+    [self heapSort:array.mutableCopy];
 }
+//MARK: - 堆排序
+-(void)heapSort:(NSMutableArray *)array
+{
+    NSInteger endIndex=array.count-1;
+    array=[self createHeap:array];
+    while (endIndex >= 0) {
+        NSNumber *temp = array[0];
+        array[0] = array[endIndex];
+        array[endIndex] = temp;
+        endIndex -= 1;
+        array = [self heapAdjast:array withStartIndex:0 withEndIndex:endIndex + 1];
+    }
+    NSLog(@"88--%@", array);
+}
+-(NSMutableArray *)createHeap:(NSMutableArray *)array
+{
+    NSInteger i = array.count;
+    while (i > 0) {
+        array = [self heapAdjast:array withStartIndex:i - 1 withEndIndex:array.count];
+        i -= 1;
+    }
+    return array;
+}
+-(NSMutableArray *)heapAdjast:(NSMutableArray *)items withStartIndex:(NSInteger)startIndex withEndIndex:(NSInteger)endIndex
+{
+    NSNumber *temp = items[startIndex];
+    NSInteger fatherIndex = startIndex + 1;
+    NSInteger maxChildIndex = 2 * fatherIndex;
+    while (maxChildIndex <= endIndex) {
+        if (maxChildIndex < endIndex && [items[maxChildIndex - 1] floatValue] < [items[maxChildIndex] floatValue]) {
+            maxChildIndex++;
+        }
+        if ([temp floatValue] < [items[maxChildIndex - 1] floatValue]) {
+            items[fatherIndex - 1] = items[maxChildIndex - 1];
+        } else {
+            break;
+        }
+        fatherIndex = maxChildIndex;
+        maxChildIndex = fatherIndex * 2;
+    }
+    items[fatherIndex - 1] = temp;
+    return items;
+}
+
 //MARK: - 基数排序
 -(void)radixSort:(NSMutableArray *)array
 {
